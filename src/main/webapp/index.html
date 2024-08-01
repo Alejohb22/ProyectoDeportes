@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Afiliados</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="js/validacion.js"></script>
+</head>
+<body>
+<h1>Gestión de Afiliados</h1>
+<form id="afiliadoForm">
+    <input type="text" id="nombre" placeholder="Nombre" required>
+    <input type="text" id="direccion" placeholder="Dirección" required>
+    <input type="text" id="telefono" placeholder="Teléfono" required>
+    <button type="submit">Agregar Afiliado</button>
+</form>
+
+<h2>Afiliados</h2>
+<ul id="afiliadoList"></ul>
+
+<script>
+    $(document).ready(function() {
+        function loadAfiliados() {
+            $.ajax({
+                url: '/afiliados',
+                type: 'GET',
+                success: function(data) {
+                    $('#afiliadoList').empty();
+                    data.forEach(function(afiliado) {
+                        $('#afiliadoList').append('<li>' + afiliado.nombre + ' - ' + afiliado.telefono + '</li>');
+                    });
+                }
+            });
+        }
+
+        $("#afiliadoForm").on("submit", function(event) {
+            event.preventDefault();
+            $.ajax({
+                url: '/afiliados',
+                type: 'POST',
+                data: JSON.stringify({
+                    nombre: $("#nombre").val(),
+                    direccion: $("#direccion").val(),
+                    telefono: $("#telefono").val()
+                }),
+                contentType: 'application/json',
+                success: function() {
+                    loadAfiliados();
+                    $("#afiliadoForm")[0].reset();
+                },
+                error: function() {
+                    alert("Error al agregar afiliado");
+                }
+            });
+        });
+
+        loadAfiliados();
+    });
+</script>
+</body>
+</html>
